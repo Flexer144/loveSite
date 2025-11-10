@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I love Sonya</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rammetto+One&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: system-ui, sans-serif;
+  height:100vh;
+  overflow:hidden;
+  color:white;
+  background:black;
+}
+
+/* видео */
+.bg{
+  position:fixed;
+  top:0; left:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:0;
+  pointer-events:none;
+}
+
+/* overlay */
+.overlay{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.4);
+  backdrop-filter: blur(3px);
+  z-index:1;
+  pointer-events:none;
+}
+
+/* контент центр */
+.content{
+  position:absolute;
+  margin: 0 auto;
+  margin-top: 110px;
+  width: 100%;
+  height: 110vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:2;
+  text-align:center;
+  gap:25px;
+}
+
+/* таймер */
+.timer{
+  font-size:25px;
+  display: flex;
+  gap: 15px;
+  flex-direction: row;
+  font-weight:600;
+  letter-spacing: .5px;
+  text-shadow: 0 0 12px rgba(255,255,255,.7);
+}
+
+.div-days, .div-hours, .div-minutes, .div-secs{
+  display: flex;
+  flex-direction: column;
+  padding:10px 18px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.45);
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,.08);
+  box-shadow: 0 5px 30px rgba(0,0,0,.3);
+}
+
+/* подпись под таймер */
+.subtext {
+  font-size:21px;
+  color: rgba(255,255,255,.65);
+  margin-bottom:10px;
+}
+.top-text{
+  font-size: 100px;
+  font-weight: 400;
+  position: absolute;
+  top: -50px;
+  color: rgba(255, 171, 168, 0.616);
+  line-height: 120px;
+  font-family: "Rammetto One", sans-serif;
+}
+
+/* кнопка письма */
+.reveal{
+  pointer-events:auto;
+  padding:14px 30px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.45);
+  color:#fff;
+  font-size:17px;
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,.08);
+  box-shadow: 0 5px 30px rgba(0,0,0,.3);
+  cursor:pointer;
+  transition: transform .25s, box-shadow .25s;
+}
+.reveal:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 7px 35px rgba(0,0,0,.35);
+}
+
+/* письмо */
+.letter{
+  max-width:350px;
+  line-height:1.5;
+  opacity:0;
+  transform:translateY(20px);
+  transition:all .5s cubic-bezier(.23,1,.32,1);
+  pointer-events:none;
+  background: rgba(255,255,255,.08);
+  padding:20px;
+  border-radius:12px;
+  backdrop-filter:blur(10px);
+  text-align: justify;
+}
+.letter.open{
+  opacity:1;
+  transform:translateY(0);
+  pointer-events:auto;
+}
+</style>
+</head>
+<body>
+<video class="bg" autoplay muted loop playsinline>
+  <source src="bg_small.mp4" type="video/mp4">
+</video>
+
+<div class="overlay"></div>
+
+
+
+<div class="content">
+  <div class="top-text">
+    Love Timer
+  </div>
+  <div class="timer" id="timer">
+    <div class="div-days">
+      <span class="days"></span>
+      Day
+    </div>
+    <div class="div-hours">
+      <span class="hours"></span>
+      Hour
+    </div>
+    <div class="div-minutes">
+      <span class="minutes"></span>
+      Min
+    </div>
+    <div class="div-secs">
+      <span class="seconds"></span>
+      Sec
+    </div>
+  </div>
+  <div class="subtext">С тобой время летит иначе</div>
+  <button class="reveal">открыть письмо</button>
+
+  <div class="letter"> 
+    <p>
+      Два месяца — вроде немного, но для меня эти недели прошли так тепло, что кажется, будто мы знаем друг друга гораздо дольше. <br>
+      Мне нравится, что с тобой всё приходит естественно — без спешки, без напряжения, без лишнего шума. рядом с тобой всё становится тише и спокойнее, и это ощущение мне очень ценно. <br>
+      Спасибо тебе за то, что ты есть рядом.<br>
+      Спасибо за твоё присутствие, за твою мягкость, за то, что ты просто ты.❤️💕<br>
+    </p>
+  </div>
+</div>
+
+<script>
+const video = document.querySelector('video');
+video.addEventListener('error', (e) => console.log("video error", e));
+video.addEventListener('loadeddata', () => console.log("video loaded"));
+
+// таймер
+const since = new Date("2025-09-29T12:30:00"); // дата старта
+const timer = {
+  days: document.querySelector('#timer .days'),
+  hours: document.querySelector('#timer .hours'),
+  minutes: document.querySelector('#timer .minutes'),
+  seconds: document.querySelector('#timer .seconds')
+};
+
+function updateTimer(){
+  const now = new Date();
+  const diff = now - since;
+
+  const days = Math.floor(diff / (1000*60*60*24));
+  const hours = Math.floor((diff / (1000*60*60)) % 24);
+  const mins = Math.floor((diff / (1000*60)) % 60);
+  const secs = Math.floor((diff / 1000) % 60);
+
+  timer.days.textContent = `${days}`;
+  timer.hours.textContent = `${hours}`;
+  timer.minutes.textContent = `${mins}`;
+  timer.seconds.textContent = `${secs}`;
+}
+updateTimer();
+setInterval(updateTimer, 1000);
+
+// кнопка открывает письмо
+document.querySelector('.reveal').onclick = () => {
+  document.querySelector('.letter').classList.toggle('open');
+};
+</script>
+</body>
+</html>
